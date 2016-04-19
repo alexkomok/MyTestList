@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="error_activity">Error</string>
+    <string name="app_name">Live Wallpapers</string>
+    <string name="result_activity">Selected Live Wallpapers</string>
+    <string name="submit">Next</string>
+	<string name="select_all">Select All</string>
+	<string name="error_title">Error:</string>
+	<string name="set_rendom_wallpaper">Set rendom Wallpaper from the list</string>
+</resources>
