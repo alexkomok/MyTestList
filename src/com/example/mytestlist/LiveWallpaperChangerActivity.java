@@ -52,7 +52,7 @@ public class LiveWallpaperChangerActivity extends Activity implements OnClickLis
 		 
         // Create a bundle object
         Bundle b = new Bundle();
-        b.putString("day", day.name());
+        b.putString(LiveWallpaperChangerHelper.DAY, day.name());
  
         // Add the bundle to the intent.
         intent.putExtras(b);

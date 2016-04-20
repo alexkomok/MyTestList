@@ -18,8 +18,8 @@ import android.service.wallpaper.WallpaperService;
 
 public class LiveWallpaperChangerHelper {
 
-	private static final String randomMap = "randomMap";
 	private static final String settings = "wallpaperChangerSettings";
+	public static final String DAY = "day";
 
 	enum Weekday {
 		Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday, Random
@@ -53,9 +53,6 @@ public class LiveWallpaperChangerHelper {
 		return availableWallpapersMap;
 	}
 
-	public static void saveMap(Map<String, String> inputMap, Context context) {
-		saveMap(inputMap, context, randomMap);
-	}
 
 	public static void saveLiveWallpaper(LiveWallpaper liveWallpaper,
 			Context context, Weekday day) {
@@ -77,11 +74,7 @@ public class LiveWallpaperChangerHelper {
 
 	}
 
-	public static Map<String, String> loadMap(Context context) {
-		return loadMap(context, randomMap);
-	}
-
-	private static void saveMap(Map<String, String> inputMap, Context context,
+	public static void saveMap(Map<String, String> inputMap, Context context,
 			String randomMap) {
 		SharedPreferences pSharedPref = context.getSharedPreferences(settings,
 				Context.MODE_PRIVATE);
@@ -95,7 +88,7 @@ public class LiveWallpaperChangerHelper {
 		}
 	}
 
-	private static Map<String, String> loadMap(Context context, String mapName) {
+	public static Map<String, String> loadMap(Context context, String mapName) {
 		Map<String, String> outputMap = new HashMap<String, String>();
 		SharedPreferences pSharedPref = context.getSharedPreferences(settings,
 				Context.MODE_PRIVATE);

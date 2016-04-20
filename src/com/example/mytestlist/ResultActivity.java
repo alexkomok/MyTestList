@@ -5,6 +5,7 @@ import java.util.Map;
 import android.app.Activity;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
  
 public class ResultActivity extends Activity {
@@ -15,9 +16,16 @@ public class ResultActivity extends Activity {
         setContentView(R.layout.result);
  
         Bundle b = getIntent().getExtras();
-        //String[] resultArr = b.getStringArray("selectedItems");
+        String day = b.getString(LiveWallpaperChangerHelper.DAY);
         
-        Map<String, String> selectedWallpapersMap = LiveWallpaperChangerHelper.loadMap(getApplicationContext());
+    	Button mButton=(Button)findViewById(R.id.set_wallpaper);
+        if(LiveWallpaperChangerHelper.Weekday.Random.name().equals(day)){
+            mButton.setText(getResources().getString(R.string.set_rendom_wallpaper));
+        } else {
+        	mButton.setText(getResources().getString(R.string.set_wallpaper));
+        } 
+        
+        Map<String, String> selectedWallpapersMap = LiveWallpaperChangerHelper.loadMap(this, day);
         
         ListView lv = (ListView) findViewById(R.id.outputList);
  

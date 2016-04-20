@@ -11,7 +11,7 @@ public class RandomLiveWallpaperActivity extends AbstractLiveWallpaperSetterActi
 
 	@Override
 	protected LiveWallpaper getLiveWallpaper() {
-		Map<String, String> selectedWallpapersMap = LiveWallpaperChangerHelper.loadMap(getApplicationContext());
+		Map<String, String> selectedWallpapersMap = LiveWallpaperChangerHelper.loadMap(this, getDay().name());
 
 		Random random = new Random();
 		List<String> keys = new ArrayList<String>(selectedWallpapersMap.keySet());

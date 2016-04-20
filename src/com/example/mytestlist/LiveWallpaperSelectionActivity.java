@@ -13,6 +13,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.Toast;
  
 public class LiveWallpaperSelectionActivity extends ListActivity implements
         OnClickListener {
@@ -21,39 +22,26 @@ public class LiveWallpaperSelectionActivity extends ListActivity implements
     ListView listView;
     CheckBox checkBox;
     LiveWallpaperListAdapter adapter;
-    
-   
+    String day;
  
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
     	
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
+		setContentView(R.layout.select_activity);
 		findViewsById();
 		
 		adapter = new LiveWallpaperListAdapter(this);
-		
-		
 		listView.setAdapter(adapter);
-		//listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-
 		button.setOnClickListener(this);
 		
-		Map<String, String> selectedWallpapersMap = LiveWallpaperChangerHelper.loadMap(this);
-		for (int i = 0; i < listView.getAdapter().getCount(); i++) {
-			if(selectedWallpapersMap.containsKey(listView.getItemAtPosition(i))){
-				listView.setItemChecked(i, true);
-			}
-			
-		}
-
 	}
     
     public void onStart(){
     	super.onStart();
         Bundle b = getIntent().getExtras();
-        String day = b.getString("day");
+        day = b.getString(LiveWallpaperChangerHelper.DAY);
         checkBox.setChecked(false);
         
         if(LiveWallpaperChangerHelper.Weekday.Random.name().equals(day)){
@@ -63,7 +51,19 @@ public class LiveWallpaperSelectionActivity extends ListActivity implements
         	listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         	checkBox.setVisibility(View.GONE);
         }
+        
+    }
+    
+    public void onResume(){
+    	super.onResume();
     	
+        Map<String, String> selectedWallpapersMap = LiveWallpaperChangerHelper.loadMap(this, day);
+		for (int i = 0; i < listView.getAdapter().getCount(); i++) {
+			if(selectedWallpapersMap.containsKey(listView.getItemAtPosition(i))){
+				listView.setItemChecked(i, true);
+			}
+			
+		}
     }
  
     private void findViewsById() {
@@ -76,6 +76,12 @@ public class LiveWallpaperSelectionActivity extends ListActivity implements
         SparseBooleanArray checked = listView.getCheckedItemPositions();
         ArrayList<String> selectedItems = new ArrayList<String>();
         Map<String, String> selectedWallpapersMap = new HashMap<String, String>();
+        
+        if(checked.size() == 0){
+        	Toast.makeText(this, "Please, select one.", Toast.LENGTH_LONG).show();
+        	return;
+        }
+        
         for (int i = 0; i < checked.size(); i++) {
             // Item position in adapter
             int position = checked.keyAt(i);
@@ -84,23 +90,15 @@ public class LiveWallpaperSelectionActivity extends ListActivity implements
                 selectedWallpapersMap.put(adapter.getItem(position).mInfo.getServiceName(), adapter.getItem(position).mInfo.getPackageName());
             }
         }
- 
-        String[] outputStrArr = new String[selectedItems.size()];
         
- 
-        for (int i = 0; i < selectedItems.size(); i++) {
-        	String key = selectedItems.get(i);
-            outputStrArr[i] = key;
-        }
-        
-        LiveWallpaperChangerHelper.saveMap(selectedWallpapersMap, this);
+        LiveWallpaperChangerHelper.saveMap(selectedWallpapersMap, this, day);
  
         Intent intent = new Intent(getApplicationContext(),
                 ResultActivity.class);
  
         // Create a bundle object
         Bundle b = new Bundle();
-        b.putStringArray("selectedItems", outputStrArr);
+        b.putString(LiveWallpaperChangerHelper.DAY, day);
  
         // Add the bundle to the intent.
         intent.putExtras(b);
