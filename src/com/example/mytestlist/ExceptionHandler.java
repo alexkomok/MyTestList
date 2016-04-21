@@ -3,20 +3,20 @@ package com.example.mytestlist;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
 public class ExceptionHandler implements
 		java.lang.Thread.UncaughtExceptionHandler {
-	private final Activity myContext;
+	private final Context myContext;
 	private final String LINE_SEPARATOR = "\n";
 
-	public ExceptionHandler(Activity context) {
+	public ExceptionHandler(Context context) {
 		myContext = context;
 	}
 	
-	public static void caughtException(Throwable exception, Activity context) {
+	public static void caughtException(Throwable exception, Context context) {
 		new ExceptionHandler(context).uncaughtException(null, exception);
 	}
 

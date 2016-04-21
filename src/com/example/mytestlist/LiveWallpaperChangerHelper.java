@@ -106,6 +106,7 @@ public class LiveWallpaperChangerHelper {
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+			ExceptionHandler.caughtException(e, context);
 		}
 		return outputMap;
 	}

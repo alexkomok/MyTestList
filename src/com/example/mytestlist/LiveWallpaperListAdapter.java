@@ -38,9 +38,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.CheckedTextView;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
+import android.widget.TextView;
 
 
 public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter {
@@ -89,8 +89,6 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
             view = convertView;
         }
 
-        //WallpaperPickerActivity.setWallpaperItemPaddingToZero((FrameLayout) view);
-
         LiveWallpaperTile wallpaperInfo = mWallpapers.get(position);
         wallpaperInfo.setView(view);
         ImageView image = (ImageView) view.findViewById(R.id.wallpaper_image);
@@ -103,9 +101,9 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
             icon.setVisibility(View.VISIBLE);
         }
 
-        CheckedTextView  label = (CheckedTextView ) view.findViewById(R.id.wallpaper_item_label);
+        TextView  label = (TextView) view.findViewById(R.id.wallpaper_item_label);
         label.setText(wallpaperInfo.mInfo.loadLabel(mPackageManager));
-
+        
         return view;
     }
 
@@ -168,9 +166,11 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
                     info = new WallpaperInfo(mContext, resolveInfo);
                 } catch (XmlPullParserException e) {
                     Log.w(LOG_TAG, "Skipping wallpaper " + resolveInfo.serviceInfo, e);
+                    ExceptionHandler.caughtException(e, mContext);
                     continue;
                 } catch (IOException e) {
                     Log.w(LOG_TAG, "Skipping wallpaper " + resolveInfo.serviceInfo, e);
+                    ExceptionHandler.caughtException(e, mContext);
                     continue;
                 }
 
@@ -205,5 +205,12 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
                 mWallpaperPosition++;
             }
         }
+        
+        @Override
+		protected void onPostExecute(Void result) {
+			if (mContext instanceof LiveWallpaperSelectionActivity) {
+				((LiveWallpaperSelectionActivity) mContext).setItemChecked();
+			}
+		}
     }
 }

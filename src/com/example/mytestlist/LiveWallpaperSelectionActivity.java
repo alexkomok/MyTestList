@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
+
+import com.example.mytestlist.LiveWallpaperListAdapter.LiveWallpaperTile;
  
 public class LiveWallpaperSelectionActivity extends ListActivity implements
         OnClickListener {
@@ -54,12 +56,12 @@ public class LiveWallpaperSelectionActivity extends ListActivity implements
         
     }
     
-    public void onResume(){
-    	super.onResume();
+    public void setItemChecked(){
     	
         Map<String, String> selectedWallpapersMap = LiveWallpaperChangerHelper.loadMap(this, day);
 		for (int i = 0; i < listView.getAdapter().getCount(); i++) {
-			if(selectedWallpapersMap.containsKey(listView.getItemAtPosition(i))){
+			LiveWallpaperTile lwp = (LiveWallpaperTile) listView.getItemAtPosition(i);
+			if(selectedWallpapersMap.containsKey(lwp.mInfo.getServiceName())){
 				listView.setItemChecked(i, true);
 			}
 			
