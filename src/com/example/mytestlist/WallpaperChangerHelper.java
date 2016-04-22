@@ -16,8 +16,9 @@ import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.service.wallpaper.WallpaperService;
 
-public class LiveWallpaperChangerHelper {
+public class WallpaperChangerHelper {
 
+	public static final String LAUNCHER2_PKG_NAME = "com.android.launcher";
 	private static final String settings = "wallpaperChangerSettings";
 	public static final String DAY = "day";
 
@@ -109,5 +110,12 @@ public class LiveWallpaperChangerHelper {
 			ExceptionHandler.caughtException(e, context);
 		}
 		return outputMap;
+	}
+	
+	public static String capitalizeFirstLetter(String original) {
+	    if (original == null || original.length() == 0) {
+	        return original;
+	    }
+	    return original.substring(0, 1).toUpperCase() + original.substring(1);
 	}
 }

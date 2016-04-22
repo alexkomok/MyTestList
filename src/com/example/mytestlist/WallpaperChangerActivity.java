@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 
-public class LiveWallpaperChangerActivity extends Activity implements OnClickListener{
+public class WallpaperChangerActivity extends Activity implements OnClickListener{
 	
 	Button random_button;
 	Button monday_button;
@@ -20,11 +20,8 @@ public class LiveWallpaperChangerActivity extends Activity implements OnClickLis
 		setContentView(R.layout.activity_main);
 		findViewsById();
 
-
 		random_button.setOnClickListener(this);
 		monday_button.setOnClickListener(this);
-		
-
 
 	}
     
@@ -36,23 +33,22 @@ public class LiveWallpaperChangerActivity extends Activity implements OnClickLis
 	@Override
 	public void onClick(View v) {
 		
-		
-		LiveWallpaperChangerHelper.Weekday day = LiveWallpaperChangerHelper.Weekday.Random;
+		WallpaperChangerHelper.Weekday day = WallpaperChangerHelper.Weekday.Random;
+		Intent intent = new Intent(this, WallpaperSelectionActivity.class);
 		
 		switch (v.getId()) {
 	      case R.id.random_button:
-	    	  day = LiveWallpaperChangerHelper.Weekday.Random;
+	    	  day = WallpaperChangerHelper.Weekday.Random;
 	        break;
 	      case R.id.monday_button:
-	    	  day = LiveWallpaperChangerHelper.Weekday.Monday;
+	    	  day = WallpaperChangerHelper.Weekday.Monday;
 	        break;
 	      }
 		
-		Intent intent = new Intent(this, LiveWallpaperSelectionActivity.class);
-		 
+		
         // Create a bundle object
         Bundle b = new Bundle();
-        b.putString(LiveWallpaperChangerHelper.DAY, day.name());
+        b.putString(WallpaperChangerHelper.DAY, day.name());
  
         // Add the bundle to the intent.
         intent.putExtras(b);

@@ -16,16 +16,16 @@ public class ResultActivity extends Activity {
         setContentView(R.layout.result);
  
         Bundle b = getIntent().getExtras();
-        String day = b.getString(LiveWallpaperChangerHelper.DAY);
+        String day = b.getString(WallpaperChangerHelper.DAY);
         
     	Button mButton=(Button)findViewById(R.id.set_wallpaper);
-        if(LiveWallpaperChangerHelper.Weekday.Random.name().equals(day)){
+        if(WallpaperChangerHelper.Weekday.Random.name().equals(day)){
             mButton.setText(getResources().getString(R.string.set_rendom_wallpaper));
         } else {
         	mButton.setText(getResources().getString(R.string.set_wallpaper));
         } 
         
-        Map<String, String> selectedWallpapersMap = LiveWallpaperChangerHelper.loadMap(this, day);
+        Map<String, String> selectedWallpapersMap = WallpaperChangerHelper.loadMap(this, day);
         
         ListView lv = (ListView) findViewById(R.id.outputList);
  

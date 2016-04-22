@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import android.app.ListActivity;
+import android.app.WallpaperInfo;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.SparseBooleanArray;
@@ -14,16 +15,16 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.Toast;
-
-import com.example.mytestlist.LiveWallpaperListAdapter.LiveWallpaperTile;
  
-public class LiveWallpaperSelectionActivity extends ListActivity implements
+public class WallpaperSelectionActivity extends ListActivity implements
         OnClickListener {
 	
     Button button;
     ListView listView;
     CheckBox checkBox;
-    LiveWallpaperListAdapter adapter;
+    WallpaperListAdapter wallpaperListAdapter;
+    LiveWallpaperListAdapter liveWallpaperListAdapter;
+    MergeAdapter mergeAdapter;
     String day;
  
     /** Called when the activity is first created. */
@@ -34,8 +35,20 @@ public class LiveWallpaperSelectionActivity extends ListActivity implements
 		setContentView(R.layout.select_activity);
 		findViewsById();
 		
-		adapter = new LiveWallpaperListAdapter(this);
-		listView.setAdapter(adapter);
+		wallpaperListAdapter = new WallpaperListAdapter(this);
+		liveWallpaperListAdapter = new LiveWallpaperListAdapter(this);
+		mergeAdapter = new MergeAdapter();
+
+		mergeAdapter.addAdapter(new ListTitleAdapter(this, getString(R.string.wallpapers), wallpaperListAdapter));
+		mergeAdapter.addAdapter(wallpaperListAdapter);		
+		mergeAdapter.addAdapter(new ListTitleAdapter(this, getString(R.string.live_wallpapers), liveWallpaperListAdapter));
+		mergeAdapter.addAdapter(liveWallpaperListAdapter);
+		
+		
+
+
+		
+		listView.setAdapter(mergeAdapter);
 		button.setOnClickListener(this);
 		
 	}
@@ -43,10 +56,10 @@ public class LiveWallpaperSelectionActivity extends ListActivity implements
     public void onStart(){
     	super.onStart();
         Bundle b = getIntent().getExtras();
-        day = b.getString(LiveWallpaperChangerHelper.DAY);
+        day = b.getString(WallpaperChangerHelper.DAY);
         checkBox.setChecked(false);
         
-        if(LiveWallpaperChangerHelper.Weekday.Random.name().equals(day)){
+        if(WallpaperChangerHelper.Weekday.Random.name().equals(day)){
         	listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         	checkBox.setVisibility(View.VISIBLE);
         } else {
@@ -58,13 +71,16 @@ public class LiveWallpaperSelectionActivity extends ListActivity implements
     
     public void setItemChecked(){
     	
-        Map<String, String> selectedWallpapersMap = LiveWallpaperChangerHelper.loadMap(this, day);
+        Map<String, String> selectedWallpapersMap = WallpaperChangerHelper.loadMap(this, day);
 		for (int i = 0; i < listView.getAdapter().getCount(); i++) {
-			LiveWallpaperTile lwp = (LiveWallpaperTile) listView.getItemAtPosition(i);
-			if(selectedWallpapersMap.containsKey(lwp.mInfo.getServiceName())){
-				listView.setItemChecked(i, true);
+			if (listView.getItemAtPosition(i) instanceof WallpaperTile) {
+				WallpaperTile lwp = (WallpaperTile) listView.getItemAtPosition(i);
+				if (WallpaperTile.Type.live.equals(lwp.getType()) && selectedWallpapersMap.containsKey(lwp.getWallpaperInfo().getServiceName())) {
+					listView.setItemChecked(i, true);
+				} else if (WallpaperTile.Type.system.equals(lwp.getType()) && selectedWallpapersMap.containsKey("" + lwp.getThumbnailResId())) {
+					listView.setItemChecked(i, true);
+				}
 			}
-			
 		}
     }
  
@@ -80,27 +96,40 @@ public class LiveWallpaperSelectionActivity extends ListActivity implements
         Map<String, String> selectedWallpapersMap = new HashMap<String, String>();
         
         if(checked.size() == 0){
-        	Toast.makeText(this, "Please, select one.", Toast.LENGTH_LONG).show();
+        	Toast.makeText(this,  getString(R.string.select_one), Toast.LENGTH_LONG).show();
         	return;
         }
+        
+        int wallpaperListShift = 1;
+        int liveWallpaperListShift = wallpaperListAdapter.getCount() + 1 + wallpaperListShift;
         
         for (int i = 0; i < checked.size(); i++) {
             // Item position in adapter
             int position = checked.keyAt(i);
-            if (checked.valueAt(i)) {
-                selectedItems.add(adapter.getItem(position).mInfo.getServiceName());
-                selectedWallpapersMap.put(adapter.getItem(position).mInfo.getServiceName(), adapter.getItem(position).mInfo.getPackageName());
+            Object item = mergeAdapter.getItem(position);
+            if (checked.valueAt(i) && item instanceof WallpaperTile) {
+            	
+            	if(WallpaperTile.Type.live.equals(((WallpaperTile)item).getType())){
+                	WallpaperInfo info = liveWallpaperListAdapter.getItem(position - liveWallpaperListShift).getWallpaperInfo();
+                    selectedItems.add(info.getServiceName());
+                    selectedWallpapersMap.put(info.getServiceName(), info.getPackageName());
+            	} else  if((WallpaperTile.Type.system.equals(((WallpaperTile)item).getType()))){
+            		WallpaperTile wallpaperTile = wallpaperListAdapter.getItem(position - wallpaperListShift);
+            		selectedWallpapersMap.put("" + wallpaperTile.getThumbnailResId(), "" + wallpaperTile.getImageResId());
+            	}
+            	
+
             }
         }
         
-        LiveWallpaperChangerHelper.saveMap(selectedWallpapersMap, this, day);
+        WallpaperChangerHelper.saveMap(selectedWallpapersMap, this, day);
  
         Intent intent = new Intent(getApplicationContext(),
                 ResultActivity.class);
  
         // Create a bundle object
         Bundle b = new Bundle();
-        b.putString(LiveWallpaperChangerHelper.DAY, day);
+        b.putString(WallpaperChangerHelper.DAY, day);
  
         // Add the bundle to the intent.
         intent.putExtras(b);
