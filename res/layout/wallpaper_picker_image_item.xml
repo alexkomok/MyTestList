@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+    <ImageView
+        android:id="@+id/wallpaper_image"
+        android:layout_width="@dimen/wallpaperThumbnailWidth"
+        android:layout_height="@dimen/wallpaperThumbnailHeight"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="36dip"
+        android:background="@android:color/black"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/wallpaper_item_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignRight="@+id/wallpaper_image"
+        android:layout_gravity="bottom"
+        android:background="@color/wallpaper_picker_translucent_gray"
+        android:drawableTop="@drawable/ic_images"
+        android:ellipsize="marquee"
+        android:gravity="center"
+        android:padding="10dp"
+        android:layout_marginLeft="36dip"
+        android:singleLine="true"
+        android:text="@string/pick_image"
+        android:textColor="@android:color/white" />
+          
+</RelativeLayout>

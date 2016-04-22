@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import com.example.mytestlist.LiveWallpaperChangerHelper.Weekday;
+import com.example.mytestlist.WallpaperChangerHelper.Weekday;
 
 public class RandomLiveWallpaperActivity extends AbstractLiveWallpaperSetterActivity {
 
 	@Override
 	protected LiveWallpaper getLiveWallpaper() {
-		Map<String, String> selectedWallpapersMap = LiveWallpaperChangerHelper.loadMap(this, getDay().name());
+		Map<String, String> selectedWallpapersMap = WallpaperChangerHelper.loadMap(this, getDay().name());
 
 		Random random = new Random();
 		List<String> keys = new ArrayList<String>(selectedWallpapersMap.keySet());
@@ -23,7 +23,7 @@ public class RandomLiveWallpaperActivity extends AbstractLiveWallpaperSetterActi
 
 	@Override
 	protected Weekday getDay() {
-		return LiveWallpaperChangerHelper.Weekday.Random;
+		return WallpaperChangerHelper.Weekday.Random;
 	}
 
 }

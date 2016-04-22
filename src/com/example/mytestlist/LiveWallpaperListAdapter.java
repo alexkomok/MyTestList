@@ -49,7 +49,7 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
     private final LayoutInflater mInflater;
     private final PackageManager mPackageManager;
 
-    private List<LiveWallpaperTile> mWallpapers;
+    private List<WallpaperTile> mWallpapers;
 
     @SuppressWarnings("unchecked")
     public LiveWallpaperListAdapter(Context context) {
@@ -60,7 +60,7 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
                 new Intent(WallpaperService.SERVICE_INTERFACE),
                 PackageManager.GET_META_DATA);
 
-        mWallpapers = new ArrayList<LiveWallpaperTile>();
+        mWallpapers = new ArrayList<WallpaperTile>();
 
         new LiveWallpaperEnumerator(context).execute(list);
     }
@@ -72,7 +72,7 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
         return mWallpapers.size();
     }
 
-    public LiveWallpaperTile getItem(int position) {
+    public WallpaperTile getItem(int position) {
         return mWallpapers.get(position);
     }
 
@@ -89,25 +89,24 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
             view = convertView;
         }
 
-        LiveWallpaperTile wallpaperInfo = mWallpapers.get(position);
-        wallpaperInfo.setView(view);
+        WallpaperTile wallpaperTile = mWallpapers.get(position);
         ImageView image = (ImageView) view.findViewById(R.id.wallpaper_image);
         ImageView icon = (ImageView) view.findViewById(R.id.wallpaper_icon);
-        if (wallpaperInfo.mThumbnail != null) {
-            image.setImageDrawable(wallpaperInfo.mThumbnail);
+        if (wallpaperTile.getThumbnail() != null) {
+            image.setImageDrawable(wallpaperTile.getThumbnail());
             icon.setVisibility(View.GONE);
         } else {
-            icon.setImageDrawable(wallpaperInfo.mInfo.loadIcon(mPackageManager));
+            icon.setImageDrawable(wallpaperTile.getWallpaperInfo().loadIcon(mPackageManager));
             icon.setVisibility(View.VISIBLE);
         }
 
         TextView  label = (TextView) view.findViewById(R.id.wallpaper_item_label);
-        label.setText(wallpaperInfo.mInfo.loadLabel(mPackageManager));
+        label.setText(wallpaperTile.getWallpaperInfo().loadLabel(mPackageManager));
         
         return view;
     }
 
-    public static class LiveWallpaperTile  {
+/*    public static class WallpaperTile  {
         private Drawable mThumbnail;
         public WallpaperInfo mInfo;
         protected View mView;
@@ -116,22 +115,22 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
         public void setView(View v) {
             mView = v;
         }      
-        public LiveWallpaperTile(Drawable thumbnail, WallpaperInfo info, Intent intent) {
+        public WallpaperTile(Drawable thumbnail, WallpaperInfo info, Intent intent) {
             mThumbnail = thumbnail;
             mInfo = info;
         }
-/*        @Override
+        @Override
         public void onClick(WallpaperPickerActivity a) {
             Intent preview = new Intent(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
             preview.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT,
                     mInfo.getComponent());
             a.onLiveWallpaperPickerLaunch(mInfo);
             a.startActivityForResultSafely(preview, WallpaperPickerActivity.PICK_LIVE_WALLPAPER);
-        }*/
-    }
+        }
+    }*/
 
     private class LiveWallpaperEnumerator extends
-            AsyncTask<List<ResolveInfo>, LiveWallpaperTile, Void> {
+            AsyncTask<List<ResolveInfo>, WallpaperTile, Void> {
         private Context mContext;
         private int mWallpaperPosition;
 
@@ -178,24 +177,24 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
                 Drawable thumb = info.loadThumbnail(packageManager);
                 Intent launchIntent = new Intent(WallpaperService.SERVICE_INTERFACE);
                 launchIntent.setClassName(info.getPackageName(), info.getServiceName());
-                LiveWallpaperTile wallpaper = new LiveWallpaperTile(thumb, info, launchIntent);
+                WallpaperTile wallpaper = new WallpaperTile(thumb, info, launchIntent, WallpaperTile.Type.live);
                 publishProgress(wallpaper);
             }
             // Send a null object to show loading is finished
-            publishProgress((LiveWallpaperTile) null);
+            publishProgress((WallpaperTile) null);
 
             return null;
         }
 
         @Override
-        protected void onProgressUpdate(LiveWallpaperTile...infos) {
-            for (LiveWallpaperTile info : infos) {
+        protected void onProgressUpdate(WallpaperTile...infos) {
+            for (WallpaperTile info : infos) {
                 if (info == null) {
                     LiveWallpaperListAdapter.this.notifyDataSetChanged();
                     break;
                 }
-                if (info.mThumbnail != null) {
-                    info.mThumbnail.setDither(true);
+                if (info.getThumbnail() != null) {
+                    info.getThumbnail().setDither(true);
                 }
                 if (mWallpaperPosition < mWallpapers.size()) {
                     mWallpapers.set(mWallpaperPosition, info);
@@ -208,8 +207,8 @@ public class LiveWallpaperListAdapter extends BaseAdapter implements ListAdapter
         
         @Override
 		protected void onPostExecute(Void result) {
-			if (mContext instanceof LiveWallpaperSelectionActivity) {
-				((LiveWallpaperSelectionActivity) mContext).setItemChecked();
+			if (mContext instanceof WallpaperSelectionActivity) {
+				((WallpaperSelectionActivity) mContext).setItemChecked();
 			}
 		}
     }

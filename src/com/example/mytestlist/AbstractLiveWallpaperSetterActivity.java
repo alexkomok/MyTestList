@@ -16,7 +16,7 @@ abstract class AbstractLiveWallpaperSetterActivity extends Activity {
 	
 
 	protected abstract LiveWallpaper getLiveWallpaper();
-	protected abstract LiveWallpaperChangerHelper.Weekday getDay();
+	protected abstract WallpaperChangerHelper.Weekday getDay();
 	
     @Override
 	protected void onStart() {
@@ -42,7 +42,7 @@ abstract class AbstractLiveWallpaperSetterActivity extends Activity {
 			Intent intent = new Intent(WallpaperService.SERVICE_INTERFACE);
 			LiveWallpaper wallpaper = getLiveWallpaper();
 			
-			if (LiveWallpaperChangerHelper.isLiveWallpaperValid(wallpaper, this)) {
+			if (WallpaperChangerHelper.isLiveWallpaperValid(wallpaper, this)) {
 				intent.setClassName(wallpaper.getPackageName(),wallpaper.getClassName());
 				method.invoke(objIWallpaperManager, intent.getComponent());
 				
@@ -60,10 +60,10 @@ abstract class AbstractLiveWallpaperSetterActivity extends Activity {
 				}, 100L);				
 			} else {
 				
-				Class activityClazz = LiveWallpaperSelectionActivity.class;
+				Class activityClazz = WallpaperSelectionActivity.class;
 				
 				if(this instanceof RandomLiveWallpaperActivity){
-					activityClazz = LiveWallpaperSelectionActivity.class;
+					activityClazz = WallpaperSelectionActivity.class;
 				}
 				
 				intent = new Intent(getApplicationContext(), activityClazz);

@@ -1,18 +1,18 @@
 package com.example.mytestlist;
 
-import com.example.mytestlist.LiveWallpaperChangerHelper.Weekday;
+import com.example.mytestlist.WallpaperChangerHelper.Weekday;
 
 
 public class MondayLiveWallpaperActivity extends AbstractLiveWallpaperSetterActivity {
 
 	@Override
 	protected LiveWallpaper getLiveWallpaper() {
-		return  LiveWallpaperChangerHelper.loadLiveWallpaper(getApplicationContext(), getDay());
+		return  WallpaperChangerHelper.loadLiveWallpaper(getApplicationContext(), getDay());
 	}
 
 	@Override
 	protected Weekday getDay() {
-		return LiveWallpaperChangerHelper.Weekday.Monday;
+		return WallpaperChangerHelper.Weekday.Monday;
 	}
 
 }
