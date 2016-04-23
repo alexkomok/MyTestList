@@ -12,10 +12,10 @@
         android:ellipsize="marquee"
         android:gravity="left"
         android:linksClickable="false"
-        android:padding="10dp"
+        android:padding="15dp"
         android:singleLine="true"
         android:textColor="@android:color/white"
-        android:textSize="20sp"
+        android:textSize="@dimen/abc_action_bar_title_text_size"
         android:textStyle="bold" />
 
 </LinearLayout>

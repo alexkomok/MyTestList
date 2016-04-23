@@ -8,7 +8,9 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:onClick="onCheckboxClicked"
+        android:padding="15dp"
         android:text="@string/select_all"
+        android:textSize="@dimen/abc_action_bar_title_text_size"
         android:textStyle="bold" />
 
     <Button

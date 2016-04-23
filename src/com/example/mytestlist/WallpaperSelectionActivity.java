@@ -44,10 +44,6 @@ public class WallpaperSelectionActivity extends ListActivity implements
 		mergeAdapter.addAdapter(new ListTitleAdapter(this, getString(R.string.live_wallpapers), liveWallpaperListAdapter));
 		mergeAdapter.addAdapter(liveWallpaperListAdapter);
 		
-		
-
-
-		
 		listView.setAdapter(mergeAdapter);
 		button.setOnClickListener(this);
 		
