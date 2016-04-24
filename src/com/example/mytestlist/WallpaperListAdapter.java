@@ -16,16 +16,12 @@
 
 package com.example.mytestlist;
 
-import java.io.File;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
-import android.content.pm.PackageManager.NameNotFoundException;
-import android.content.res.Resources;
-import android.content.res.Resources.NotFoundException;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,18 +30,21 @@ import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
+import com.example.mytestlist.WallpaperChangerHelper.SystemWallpapersStorage;
+
 public class WallpaperListAdapter extends BaseAdapter implements ListAdapter {
-	private static final String LOG_TAG = "WallpaperListAdapter";
 	private LayoutInflater mInflater;
 
-    private Context mContext;
     private List<WallpaperTile> mWallpapers;
     
 	WallpaperListAdapter(Context context) {
-		mContext = context;
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mWallpapers = new ArrayList<WallpaperTile>();
-		findWallpapers();
+		
+		for(SystemWallpapersStorage storage : SystemWallpapersStorage.values()){
+			mWallpapers.addAll(WallpaperChangerHelper.getWallpaperTilesFromSystemWallpapers(context, storage));
+		}
+		
 	}
 
     public int getCount() {
@@ -192,54 +191,5 @@ public class WallpaperListAdapter extends BaseAdapter implements ListAdapter {
         }
     }*/
     
-    
-    private void findWallpapers() {
-        Resources resources = mContext.getResources();
-		try {
-			resources = mContext.getPackageManager().getResourcesForApplication(WallpaperChangerHelper.LAUNCHER2_PKG_NAME);
-		} catch (NameNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-        // Context.getPackageName() may return the "original" package name,
-        // com.android.launcher2; Resources needs the real package name,
-        // com.android.launcher. So we ask Resources for what it thinks the
-        // package name should be.
-        int listWallpaperId = resources.getIdentifier("wallpapers", "array", WallpaperChangerHelper.LAUNCHER2_PKG_NAME);
-        int listExtraWallpaperId = resources.getIdentifier("extra_wallpapers", "array", WallpaperChangerHelper.LAUNCHER2_PKG_NAME);
-        addWallpapers(resources, WallpaperChangerHelper.LAUNCHER2_PKG_NAME, listWallpaperId);
-        addWallpapers(resources, WallpaperChangerHelper.LAUNCHER2_PKG_NAME, listExtraWallpaperId);
-
-    }
-
-
-	private void addWallpapers(Resources resources, String packageName, int list) {
-		final String[] extras = resources.getStringArray(list);
-		for (String extra : extras) {
-			int imageRes = resources.getIdentifier(extra, "drawable",
-					packageName);
-			if (imageRes != 0) {
-
-				final int thumbRes = resources.getIdentifier(extra + "_small", "drawable", packageName);
-
-				if (thumbRes != 0) {
-					File thumbnailPath = null;
-					Drawable thumbnail = null;
-					try {
-						thumbnailPath = new File(resources.getString(thumbRes));
-						thumbnail = resources.getDrawable( thumbRes );
-						WallpaperTile wallpaperTile = new WallpaperTile(thumbnailPath, thumbnail, null, imageRes, thumbRes, WallpaperTile.Type.system);
-						mWallpapers.add(wallpaperTile);
-						Log.d(LOG_TAG, "add: [" + packageName + "]: " + extra + " (" + imageRes + ")");
-					} catch (NotFoundException e) {
-						// skip
-						e.printStackTrace();
-					}
-
-				}
-			}
-		}
-	}
     
 }

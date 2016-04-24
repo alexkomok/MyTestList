@@ -1,5 +1,7 @@
 package com.example.mytestlist;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -13,8 +15,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
+import android.content.res.Resources;
+import android.content.res.Resources.NotFoundException;
+import android.graphics.drawable.Drawable;
 import android.service.wallpaper.WallpaperService;
+import android.util.Log;
 
 public class WallpaperChangerHelper {
 
@@ -25,6 +32,51 @@ public class WallpaperChangerHelper {
 	enum Weekday {
 		Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday, Random
 	};
+	
+	enum SystemWallpapersStorage {wallpapers, extra_wallpapers}
+	
+    public static List<WallpaperTile> getWallpaperTilesFromSystemWallpapers(Context context, SystemWallpapersStorage storage) {
+    	List<WallpaperTile> resultList = new ArrayList<WallpaperTile>();
+        Resources resources = null;
+		try {
+			resources = context.getPackageManager().getResourcesForApplication(WallpaperChangerHelper.LAUNCHER2_PKG_NAME);
+		} catch (NameNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(resources != null){
+	        // Context.getPackageName() may return the "original" package name,
+	        // com.android.launcher2; Resources needs the real package name,
+	        // com.android.launcher. So we ask Resources for what it thinks the
+	        // package name should be.
+	        int listWallpaperId = resources.getIdentifier(storage.name(), "array", LAUNCHER2_PKG_NAME);
+			final String[] extras = resources.getStringArray(listWallpaperId);
+			for (String extra : extras) {
+				int imageRes = resources.getIdentifier(extra, "drawable", LAUNCHER2_PKG_NAME);
+				if (imageRes != 0) {
+	
+					final int thumbRes = resources.getIdentifier(extra + "_small", "drawable", LAUNCHER2_PKG_NAME);
+	
+					if (thumbRes != 0) {
+						File thumbnailPath = null;
+						Drawable thumbnail = null;
+						try {
+							thumbnailPath = new File(resources.getString(thumbRes));
+							thumbnail = resources.getDrawable( thumbRes );
+							WallpaperTile wallpaperTile = new WallpaperTile(thumbnailPath, thumbnail, null, imageRes, thumbRes, WallpaperTile.Type.system);
+							resultList.add(wallpaperTile);
+						} catch (NotFoundException e) {
+							// skip
+							e.printStackTrace();
+						}
+					}
+				}
+			}
+		}
+
+        return resultList;
+    }
+
 	
 	public static boolean isLiveWallpaperValid(LiveWallpaper liveWallpaper, Activity activity){
 		boolean result = false;

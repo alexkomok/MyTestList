@@ -1,8 +1,12 @@
 package com.example.mytestlist;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.ComponentName;
@@ -11,6 +15,8 @@ import android.content.Intent;
 import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
 
+import com.example.mytestlist.WallpaperChangerHelper.SystemWallpapersStorage;
+
 
 abstract class AbstractLiveWallpaperSetterActivity extends Activity {
 	
@@ -18,13 +24,12 @@ abstract class AbstractLiveWallpaperSetterActivity extends Activity {
 	protected abstract LiveWallpaper getLiveWallpaper();
 	protected abstract WallpaperChangerHelper.Weekday getDay();
 	
-    @Override
+    @SuppressLint("ServiceCast") @Override
 	protected void onStart() {
 		super.onStart();
 		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
 		
-		Context context = getApplicationContext();
-		WallpaperManager manager = WallpaperManager.getInstance(context);
+		WallpaperManager manager = WallpaperManager.getInstance(this);
 		Method method = null;
 
 		try {
@@ -42,10 +47,45 @@ abstract class AbstractLiveWallpaperSetterActivity extends Activity {
 			Intent intent = new Intent(WallpaperService.SERVICE_INTERFACE);
 			LiveWallpaper wallpaper = getLiveWallpaper();
 			
+			List<WallpaperTile> mallpaperList = new ArrayList<WallpaperTile>();
+			for(SystemWallpapersStorage storage : SystemWallpapersStorage.values()){
+				
+				mallpaperList.addAll(WallpaperChangerHelper.getWallpaperTilesFromSystemWallpapers(this, storage));
+			}
+			
+			boolean isSuccess = false;
+			
 			if (WallpaperChangerHelper.isLiveWallpaperValid(wallpaper, this)) {
 				intent.setClassName(wallpaper.getPackageName(),wallpaper.getClassName());
 				method.invoke(objIWallpaperManager, intent.getComponent());
+				isSuccess = true;
+			} else {
 				
+				WallpaperTile wallpaperTile = null;
+				
+				for(WallpaperTile tile : mallpaperList){
+					if((tile.getThumbnailResId() + "").equals(wallpaper.getClassName())){
+						wallpaperTile = tile;
+						break;
+					}
+				}
+				
+				if (wallpaperTile != null){
+			        try {
+			            WallpaperManager wpm = (WallpaperManager) getSystemService(Context.WALLPAPER_SERVICE);
+			            wpm.setResource(wallpaperTile.getImageResId());
+			            isSuccess = true;
+			        } catch (IOException e) {
+						e.printStackTrace();
+						ExceptionHandler.caughtException(e, this);
+			        }
+				}
+				
+				
+
+			}
+			
+			if (isSuccess) {
 				Handler mHandler = new Handler();
 				mHandler.postDelayed(new Runnable() {
 
@@ -57,9 +97,8 @@ abstract class AbstractLiveWallpaperSetterActivity extends Activity {
 						startActivity(homeIntent);
 					}
 
-				}, 100L);				
+				}, 100L);
 			} else {
-				
 				Class activityClazz = WallpaperSelectionActivity.class;
 				
 				if(this instanceof RandomLiveWallpaperActivity){
@@ -70,6 +109,9 @@ abstract class AbstractLiveWallpaperSetterActivity extends Activity {
 				intent.putExtra("msg", "test");
 				startActivity(intent);
 			}
+
+			
+
 			
 			
 		} catch (NoSuchMethodException e) {
