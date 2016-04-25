@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="main_activity">Create Wallpaper Activity</string>
+	<string name="main_activity">Create Wallpaper</string>
     <string name="error_activity">Error</string>
     <string name="app_name">Wallpaper Changer</string>
     <string name="result_activity">Selected Wallpapers</string>
@@ -18,6 +18,6 @@
 	<string name="saturday">Saturday</string>
 	<string name="sunday">Sunday</string>
 	<string name="select_one">Please, select one</string>
-	<string name="wallpapers">System Wallpapers:</string>
-	<string name="live_wallpapers">Live Wallpapers:</string>
+	<string name="select_one_or_more">Please, select one or more</string>
+	<string name="error_update_list">Some wallpapers are missing. Please, update you list</string>
 </resources>

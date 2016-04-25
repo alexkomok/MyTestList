@@ -1,25 +1,24 @@
 package com.example.mytestlist;
 
-import java.util.Map;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
  
 public class ResultActivity extends Activity implements OnClickListener {
 	String day;
 	Button set_wallpaper;
+	ListView listView;
+	SelectedWallpaperListAdapter mAdapter;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.result);
- 
+        setContentView(R.layout.activity_result);
+        
         Bundle b = getIntent().getExtras();
         day = b.getString(WallpaperChangerHelper.DAY);
         
@@ -32,22 +31,20 @@ public class ResultActivity extends Activity implements OnClickListener {
         
         mButton.setOnClickListener(this);
         
-        Map<String, String> selectedWallpapersMap = WallpaperChangerHelper.loadMap(this, day);
-        
-        ListView lv = (ListView) findViewById(R.id.outputList);
- 
-        ArrayAdapter<String> adapter = new ArrayAdapter(this,
-                android.R.layout.simple_list_item_1, selectedWallpapersMap.keySet().toArray());
-        lv.setAdapter(adapter);
+        listView = (ListView) findViewById(R.id.outputList);
+		mAdapter = new SelectedWallpaperListAdapter(this, WallpaperSelectionActivity.selectedTilesList);
+
+		listView.setAdapter(mAdapter);
+		listView.setChoiceMode(ListView.CHOICE_MODE_NONE);
     }
 
 	@Override
 	public void onClick(View v) {
 		
 		if(WallpaperChangerHelper.Weekday.Random.name().equals(day)){
-			startActivity( new Intent(getApplicationContext(),  RandomLiveWallpaperActivity.class));
+			startActivity( new Intent(this,  RandomLiveWallpaperActivity.class));
 		} else if (WallpaperChangerHelper.Weekday.Monday.name().equals(day)) {
-			startActivity( new Intent(getApplicationContext(),  MondayLiveWallpaperActivity.class));
+			startActivity( new Intent(this,  MondayLiveWallpaperActivity.class));
 		}
 		
 

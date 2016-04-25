@@ -9,7 +9,6 @@
         android:layout_height="wrap_content"
         android:onClick="onCheckboxClicked"
         android:text="@string/select_all"
-        android:textSize="@dimen/abc_action_bar_title_text_size"
         android:textStyle="bold" />
 
     <Button

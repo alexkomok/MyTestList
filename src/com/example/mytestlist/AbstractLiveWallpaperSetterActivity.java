@@ -1,91 +1,85 @@
 package com.example.mytestlist;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.service.wallpaper.WallpaperService;
-
-import com.example.mytestlist.WallpaperChangerHelper.SystemWallpapersStorage;
-
+import android.util.Log;
 
 abstract class AbstractLiveWallpaperSetterActivity extends Activity {
-	
+
+	private static final String TAG = "AbstractLiveWallpaperSetterActivity";
 
 	protected abstract LiveWallpaper getLiveWallpaper();
+
 	protected abstract WallpaperChangerHelper.Weekday getDay();
-	
-    @SuppressLint("ServiceCast") @Override
+
+	Method method;
+	Object objIWallpaperManager;
+
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
+
+		if (Build.VERSION.SDK_INT <= 15) {
+
+			WallpaperManager manager = WallpaperManager.getInstance(this);
+
+			try {
+				method = WallpaperManager.class.getMethod("getIWallpaperManager", null);
+				objIWallpaperManager = method.invoke(manager, null);
+				Class[] param = new Class[1];
+				param[0] = ComponentName.class;
+				method = objIWallpaperManager.getClass().getMethod("setWallpaperComponent", param);
+
+			} catch (NoSuchMethodException e) {
+				Log.e(TAG, "Error onCreate", e);
+				ExceptionHandler.caughtException(e, this);
+			} catch (IllegalAccessException e) {
+				Log.e(TAG, "Error onCreate", e);
+				ExceptionHandler.caughtException(e, this);
+			} catch (InvocationTargetException e) {
+				Log.e(TAG, "Error onCreate", e);
+				ExceptionHandler.caughtException(e, this);
+			}
+		}
+
+	}
+
+	@Override
 	protected void onStart() {
 		super.onStart();
 		Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler(this));
-		
-		WallpaperManager manager = WallpaperManager.getInstance(this);
-		Method method = null;
+		LiveWallpaper wallpaper = getLiveWallpaper();
+		Intent intent = new Intent();
+		boolean isSuccess = false;
 
-		try {
-			method = WallpaperManager.class.getMethod("getIWallpaperManager", null);
+		if (Build.VERSION.SDK_INT > 15) {
 
-			Object objIWallpaperManager = null;
+			intent.setAction(WallpaperManager.ACTION_CHANGE_LIVE_WALLPAPER);
+			String packageName = wallpaper.getPackageName();
+			String className = wallpaper.getClassName();
+			intent.putExtra(WallpaperManager.EXTRA_LIVE_WALLPAPER_COMPONENT, new ComponentName(packageName, className));
+			isSuccess = true;
+			this.startActivityForResult(intent, 0);
+		} else {
+			try {
+				intent = new Intent(WallpaperService.SERVICE_INTERFACE);
 
-			objIWallpaperManager = method.invoke(manager, null);
-
-			Class[] param = new Class[1];
-			param[0] = ComponentName.class;
-
-			method = objIWallpaperManager.getClass().getMethod("setWallpaperComponent", param);
-
-			Intent intent = new Intent(WallpaperService.SERVICE_INTERFACE);
-			LiveWallpaper wallpaper = getLiveWallpaper();
-			
-			List<WallpaperTile> mallpaperList = new ArrayList<WallpaperTile>();
-			for(SystemWallpapersStorage storage : SystemWallpapersStorage.values()){
-				
-				mallpaperList.addAll(WallpaperChangerHelper.getWallpaperTilesFromSystemWallpapers(this, storage));
-			}
-			
-			boolean isSuccess = false;
-			
-			if (WallpaperChangerHelper.isLiveWallpaperValid(wallpaper, this)) {
-				intent.setClassName(wallpaper.getPackageName(),wallpaper.getClassName());
+				// if (WallpaperChangerHelper.isLiveWallpaperValid(wallpaper,
+				// this)) {
+				intent.setClassName(wallpaper.getPackageName(), wallpaper.getClassName());
 				method.invoke(objIWallpaperManager, intent.getComponent());
 				isSuccess = true;
-			} else {
-				
-				WallpaperTile wallpaperTile = null;
-				
-				for(WallpaperTile tile : mallpaperList){
-					if((tile.getThumbnailResId() + "").equals(wallpaper.getClassName())){
-						wallpaperTile = tile;
-						break;
-					}
-				}
-				
-				if (wallpaperTile != null){
-			        try {
-			            WallpaperManager wpm = (WallpaperManager) getSystemService(Context.WALLPAPER_SERVICE);
-			            wpm.setResource(wallpaperTile.getImageResId());
-			            isSuccess = true;
-			        } catch (IOException e) {
-						e.printStackTrace();
-						ExceptionHandler.caughtException(e, this);
-			        }
-				}
-				
-				
 
-			}
-			
-			if (isSuccess) {
 				Handler mHandler = new Handler();
 				mHandler.postDelayed(new Runnable() {
 
@@ -97,43 +91,32 @@ abstract class AbstractLiveWallpaperSetterActivity extends Activity {
 						startActivity(homeIntent);
 					}
 
-				}, 100L);
-			} else {
-				Class activityClazz = WallpaperSelectionActivity.class;
-				
-				if(this instanceof RandomLiveWallpaperActivity){
-					activityClazz = WallpaperSelectionActivity.class;
-				}
-				
-				intent = new Intent(getApplicationContext(), activityClazz);
-				intent.putExtra("msg", "test");
-				startActivity(intent);
+				}, 200L);
+
+				// }
+			} catch (IllegalAccessException e) {
+				Log.e(TAG, "Failed to set wallpaper: " + e);
+			} catch (InvocationTargetException e) {
+				Log.e(TAG, "Failed to set wallpaper: " + e);
 			}
+		}
 
-			
+		if (!isSuccess) {
 
-			
-			
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-			ExceptionHandler.caughtException(e, this);
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			ExceptionHandler.caughtException(e, this);
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-			ExceptionHandler.caughtException(e, this);
-		} /*catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			ExceptionHandler.caughtException(e, this);
-		}*/
-		
+			intent = new Intent(this, WallpaperSelectionActivity.class);
 
-		
-		
+			// Create a bundle object
+			Bundle b = new Bundle();
+			b.putString(WallpaperChangerHelper.DAY, getDay().name());
+			b.putString(WallpaperChangerHelper.ERROR, WallpaperChangerHelper.ERROR);
+
+			// Add the bundle to the intent.
+			intent.putExtras(b);
+
+			startActivity(intent);
+
+		}
 
 	}
-    
 
-    	
 }

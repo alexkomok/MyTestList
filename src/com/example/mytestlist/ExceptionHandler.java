@@ -7,15 +7,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
-public class ExceptionHandler implements
-		java.lang.Thread.UncaughtExceptionHandler {
+public class ExceptionHandler implements java.lang.Thread.UncaughtExceptionHandler {
 	private final Context myContext;
 	private final String LINE_SEPARATOR = "\n";
 
 	public ExceptionHandler(Context context) {
 		myContext = context;
 	}
-	
+
 	public static void caughtException(Throwable exception, Context context) {
 		new ExceptionHandler(context).uncaughtException(null, exception);
 	}

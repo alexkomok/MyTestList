@@ -12,7 +12,7 @@ public class ErrorViewActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.error);
+		setContentView(R.layout.activity_error);
 		Textv = (TextView) findViewById(R.id.error);
 		Intent intent = getIntent();
 		Bundle bundle = intent.getExtras();

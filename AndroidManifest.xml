@@ -18,6 +18,7 @@
             android:label="@string/main_activity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -25,33 +26,26 @@
             android:name=".ResultActivity"
             android:label="@string/result_activity" >
         </activity>
-        <activity android:name=".LiveWallpaperSelectionActivity" />
         <activity android:name=".WallpaperSelectionActivity" />
-        <activity android:name=".RandomLiveWallpaperActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ListViewMultipleSelectionActivity" />
-
+        <activity
+            android:name=".RandomLiveWallpaperActivity"
+            android:noHistory="true" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".MondayLiveWallpaperActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ListViewMultipleSelectionActivity" />
-
+        <activity
+            android:name=".MondayLiveWallpaperActivity"
+            android:noHistory="true" >
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
-        </activity>        
+        </activity>
         <activity android:name=".ErrorViewActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ListViewMultipleSelectionActivity" />
-
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
 

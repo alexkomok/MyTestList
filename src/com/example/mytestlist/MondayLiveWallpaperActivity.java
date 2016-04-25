@@ -7,7 +7,7 @@ public class MondayLiveWallpaperActivity extends AbstractLiveWallpaperSetterActi
 
 	@Override
 	protected LiveWallpaper getLiveWallpaper() {
-		return  WallpaperChangerHelper.loadLiveWallpaper(getApplicationContext(), getDay());
+		return  WallpaperChangerHelper.loadLiveWallpaper(this, getDay());
 	}
 
 	@Override
