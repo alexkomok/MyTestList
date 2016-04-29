@@ -3,10 +3,9 @@ package com.example.mytestlist;
 import java.util.List;
 
 import android.app.WallpaperInfo;
-import android.app.WallpaperManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.LabeledIntent;
 import android.content.pm.PackageManager;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,25 +32,6 @@ public class SelectedWallpaperListAdapter extends BaseAdapter implements ListAda
 		mPackageManager = context.getPackageManager();
 		mWallpapers = selectedTilesList;
 		mContext = context;
-
-/*		mViewOnClickListener = new OnClickListener() {
-			public void onClick(View v) {
-
-				final Intent pickWallpaper = new Intent(Intent.ACTION_SET_WALLPAPER);
-				Intent chooser = Intent.createChooser(pickWallpaper, "test");
-				WallpaperManager wm = WallpaperManager.getInstance(context);
-				WallpaperInfo wi = wm.getWallpaperInfo();
-				if (wi != null && wi.getSettingsActivity() != null) {
-					LabeledIntent li = new LabeledIntent(getPackageName(), "test", 0);
-					li.setClassName(wi.getPackageName(), wi.getSettingsActivity());
-					chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] { li });
-				}
-				
-				context.startActivity(chooser);
-				//Toast.makeText(v.getContext(), "test", Toast.LENGTH_LONG).show();
-			}
-		};*/
-
 	}
 
 	public int getCount() {
@@ -91,22 +71,19 @@ public class SelectedWallpaperListAdapter extends BaseAdapter implements ListAda
 			icon.setVisibility(View.VISIBLE);
 		}
 
-		
 		mViewOnClickListener = new OnClickListener() {
 			public void onClick(View v) {
 
-				final Intent pickWallpaper = new Intent(Intent.ACTION_SET_WALLPAPER);
-				Intent chooser = Intent.createChooser(pickWallpaper, "test");
 				WallpaperInfo wi = wallpaperTile.mWallpaperInfo;
 				if (wi != null && wi.getSettingsActivity() != null) {
-					LabeledIntent li = new LabeledIntent(wallpaperTile.mWallpaperInfo.getPackageName(), "test", 0);
-					li.setClassName(wi.getPackageName(), wi.getSettingsActivity());
-					chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] { li });
-					//Toast.makeText(v.getContext(), wi.getSettingsActivity(), Toast.LENGTH_LONG).show();
-					mContext.startActivity(chooser);
-				} else 
-				
-				Toast.makeText(v.getContext(), "test", Toast.LENGTH_LONG).show();
+
+					Intent intent = new Intent();
+					intent.setComponent(new ComponentName(wallpaperTile.mWallpaperInfo.getPackageName(), wi.getSettingsActivity()));
+					mContext.startActivity(intent);
+
+				} else
+
+					Toast.makeText(v.getContext(), mContext.getString(R.string.no_settings), Toast.LENGTH_LONG).show();
 			}
 		};
 		
